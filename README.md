@@ -1,24 +1,24 @@
 # atlas-loop
 
-A minimal command surface for content systems.
+A minimal command surface for Instagram content systems.
 
 Not a tool.
 A loop.
 
 ```text
-Ideas -> Execution -> Feedback -> Iteration
+Ideas -> Reels -> Feedback -> Iteration
 ```
 
 Most people post.
 Few iterate.
 
-`atlas-loop` is built for iteration: a small product-shaped workflow for
-turning rough ideas into content, feedback, and better next actions.
+`atlas-loop` is built for Instagram iteration: a small product-shaped workflow
+for turning rough ideas into Reels, captions, feedback, and better next actions.
 
 ## Core Loop
 
 ```text
-IDEAS -> CONTENT -> POST -> ANALYZE -> OPTIMIZE -> REPEAT
+IDEAS -> REELS -> POST -> ANALYZE -> OPTIMIZE -> REPEAT
 ```
 
 The same loop appears in the UI, CLI, prompts, and examples so the repo feels
@@ -88,10 +88,10 @@ chmod +x cli/atlas-loop.sh
 ## Demo
 
 ```text
-/ideas -> generate ideas
-/content -> create content
-/optimize -> improve content
-/loop -> analyze performance
+/ideas -> generate Instagram ideas
+/content -> create Reels, captions, and CTAs
+/optimize -> improve Instagram content
+/loop -> analyze Instagram performance
 ```
 
 ## Structure
@@ -114,7 +114,7 @@ atlas-loop/
 
 ## Product Position
 
-This is not another social media tool.
+This is not another generic social media tool.
 This is not just another prompt repo.
 
 It is a workflow, a mental model, and a lightweight command surface for

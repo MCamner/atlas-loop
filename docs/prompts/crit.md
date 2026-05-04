@@ -1,6 +1,6 @@
 # Crit
 
-Review this content with practical, direct feedback.
+Review this Instagram content with practical, direct feedback.
 
 ```text
 Draft:
@@ -13,4 +13,5 @@ Return:
 - weakest part
 - unclear claims
 - missing proof
+- weak retention points
 - one concrete improvement

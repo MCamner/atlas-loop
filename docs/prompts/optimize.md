@@ -1,6 +1,6 @@
 # Optimize
 
-Optimize this content for clarity, retention, and action.
+Optimize this Instagram content for retention, saves, shares, comments, and action.
 
 ```text
 Draft:
@@ -9,7 +9,8 @@ Draft:
 
 Return:
 
-- stronger hook
+- stronger first 2 seconds
 - tighter structure
-- sharper CTA
+- sharper caption
+- better CTA
 - what to remove

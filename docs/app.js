@@ -1,42 +1,52 @@
 const prompts = {
-  ideas: `Generate 15 content ideas.
+  ideas: `Generate 15 Instagram content ideas.
 
 Topic:
 {{input}}
 
 Group by:
-- Teach
-- Show
-- Entertain
-- Personal`,
+- Reels
+- Carousels
+- Stories
+- Captions
 
-  content: `Create high-performing content.
+For each idea, include:
+- hook
+- format
+- why it could work on Instagram`,
+
+  content: `Create Instagram content.
 
 Goal:
 {{input}}
 
 Include:
-- Hook
-- Caption
-- CTA`,
+- Reel hook
+- short script or carousel outline
+- caption
+- CTA
+- suggested hashtags`,
 
-  optimize: `Improve this content:
+  optimize: `Improve this Instagram content:
 
 {{input}}
 
 Make it:
-- clearer
-- stronger hook
+- clearer in the first 2 seconds
+- stronger for saves and shares
+- easier to comment on
+- tighter caption
 - better CTA`,
 
-  loop: `Analyze performance:
+  loop: `Analyze Instagram performance:
 
 {{input}}
 
 Return:
 - what worked
 - what failed
-- what to repeat`
+- what to repeat
+- next post to test`
 };
 
 let activeMode = "ideas";

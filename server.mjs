@@ -90,7 +90,7 @@ async function runPrompt(req, res) {
       },
       body: JSON.stringify({
         model: MODEL,
-        instructions: "You are atlas-loop: practical, direct, concise, and focused on content iteration.",
+        instructions: "You are atlas-loop: practical, direct, concise, and focused on Instagram content iteration.",
         input: payload.prompt
       })
     });

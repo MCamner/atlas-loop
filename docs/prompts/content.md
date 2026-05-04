@@ -1,6 +1,6 @@
 # Content
 
-Create high-performing content.
+Create high-performing Instagram content.
 
 ```text
 Goal:
@@ -9,6 +9,8 @@ Goal:
 
 Include:
 
-- Hook
-- Caption
+- Reel hook
+- short script or carousel outline
+- caption
 - CTA
+- suggested hashtags

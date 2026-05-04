@@ -1,6 +1,6 @@
 # Ideas
 
-Generate 15 content ideas based on:
+Generate 15 Instagram content ideas based on:
 
 ```text
 Topic:
@@ -9,7 +9,13 @@ Topic:
 
 Group by:
 
-- Teach
-- Show
-- Entertain
-- Personal
+- Reels
+- Carousels
+- Stories
+- Captions
+
+For each idea, include:
+
+- hook
+- format
+- why it could work on Instagram

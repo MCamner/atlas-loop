@@ -7,7 +7,7 @@ await loadLocalEnv();
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 8787);
 const DOCS_DIR = new URL("./docs/", import.meta.url).pathname;
-const MODEL = process.env.OPENAI_MODEL || "gpt-5.2";
+const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",

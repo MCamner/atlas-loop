@@ -56,7 +56,7 @@ Then edit `.env`:
 
 ```text
 OPENAI_API_KEY="your_api_key_here"
-OPENAI_MODEL="gpt-5.2"
+OPENAI_MODEL="gpt-5.5"
 ```
 
 Start the engine:

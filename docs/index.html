@@ -25,21 +25,30 @@
     </section>
 
     <section class="workspace">
-      <div class="controls" aria-label="Actions">
-        <button type="button" onclick="runIdeas()">Ideas</button>
-        <button type="button" onclick="runContent()">Content</button>
-        <button type="button" onclick="runOptimize()">Optimize</button>
-        <button type="button" onclick="runLoop()">Analyze</button>
+      <div class="mode-row">
+        <span>Mode</span>
+        <div class="controls" aria-label="Mode">
+          <button type="button" data-mode="ideas" onclick="runIdeas()">Ideas</button>
+          <button type="button" data-mode="content" onclick="runContent()">Content</button>
+          <button type="button" data-mode="optimize" onclick="runOptimize()">Optimize</button>
+          <button type="button" data-mode="loop" onclick="runLoop()">Analyze</button>
+        </div>
       </div>
 
       <label for="input">Input</label>
       <textarea id="input" placeholder="Paste a topic, draft, or performance notes..."></textarea>
 
       <div class="output-header">
-        <span>Output</span>
-        <button type="button" onclick="copyOutput()">Copy</button>
+        <span>Prompt Preview</span>
+        <button type="button" onclick="copyPrompt()">Copy Prompt</button>
       </div>
-      <pre id="output">Select a command to start the loop.</pre>
+      <pre id="prompt">Choose a mode to preview the prompt.</pre>
+
+      <div class="output-header">
+        <span>Output</span>
+        <button type="button" onclick="copyOutput()">Copy Output</button>
+      </div>
+      <pre id="output">Run a mode to generate output. On GitHub Pages this stays in prompt-copy mode. Locally, start the engine server to get AI output.</pre>
     </section>
   </main>
 

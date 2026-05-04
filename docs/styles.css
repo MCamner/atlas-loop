@@ -78,6 +78,16 @@ h1 {
   background: var(--panel);
 }
 
+.mode-row {
+  display: grid;
+  gap: 8px;
+}
+
+.mode-row > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -103,6 +113,12 @@ button:focus-visible {
   color: var(--accent);
 }
 
+button.is-active {
+  border-color: var(--accent);
+  background: #10251f;
+  color: var(--accent);
+}
+
 label,
 .output-header {
   color: var(--muted);
@@ -112,7 +128,7 @@ label,
 textarea,
 pre {
   width: 100%;
-  min-height: 180px;
+  min-height: 160px;
   margin: 0;
   padding: 14px;
   border: 1px solid var(--line);
@@ -123,6 +139,7 @@ pre {
 }
 
 textarea {
+  min-height: 140px;
   resize: vertical;
 }
 

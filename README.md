@@ -44,6 +44,30 @@ Then open:
 http://127.0.0.1:8000/
 ```
 
+## Run The Engine
+
+For direct AI output, run the local server with an OpenAI API key:
+
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+npm start
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8787/
+```
+
+The browser sends prompts to the local `/api/run` endpoint. The API key stays
+in the server process and is never stored in the static GitHub Pages app.
+
+Optional:
+
+```bash
+export OPENAI_MODEL="gpt-5.2"
+```
+
 ## Use The CLI
 
 ```bash
@@ -73,6 +97,8 @@ atlas-loop/
 │   ├── app.js
 │   ├── styles.css
 │   └── prompts/
+├── server.mjs
+├── package.json
 ├── cli/
 │   └── atlas-loop.sh
 ├── examples/

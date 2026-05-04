@@ -24,6 +24,9 @@ IDEAS -> REELS -> POST -> ANALYZE -> OPTIMIZE -> REPEAT
 The same loop appears in the UI, CLI, prompts, and examples so the repo feels
 like one system instead of scattered files.
 
+The UI includes a minimal publish flow: copy content, mark it as posted, track
+Instagram metrics, then analyze performance to choose the next test.
+
 ## Run The UI
 
 Open the static app directly:

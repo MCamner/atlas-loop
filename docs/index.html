@@ -49,6 +49,32 @@
         <button type="button" onclick="copyOutput()">Copy Output</button>
       </div>
       <pre id="output">Run a mode to generate output. On GitHub Pages this stays in prompt-copy mode. Locally, start the engine server to get AI output.</pre>
+
+      <div class="publish-panel">
+        <div class="output-header">
+          <span>Publish</span>
+          <span id="postStatus">Not posted</span>
+        </div>
+        <div class="controls" aria-label="Publish actions">
+          <button type="button" onclick="copyOutput()">Copy Content</button>
+          <button type="button" onclick="markPosted()">Mark as Posted</button>
+        </div>
+      </div>
+
+      <div class="metrics-panel">
+        <span>Metrics</span>
+        <div class="metrics-grid">
+          <label for="likes">Likes</label>
+          <input id="likes" inputmode="numeric" placeholder="0">
+          <label for="saves">Saves</label>
+          <input id="saves" inputmode="numeric" placeholder="0">
+          <label for="shares">Shares</label>
+          <input id="shares" inputmode="numeric" placeholder="0">
+          <label for="comments">Comments</label>
+          <input id="comments" inputmode="numeric" placeholder="0">
+        </div>
+        <button type="button" onclick="analyzeMetrics()">Analyze Performance</button>
+      </div>
     </section>
   </main>
 

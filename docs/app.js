@@ -51,12 +51,12 @@ Return:
 
 let activeMode = "ideas";
 
-function getInput() {
-  return document.getElementById("input").value.trim() || "[INPUT]";
+function getInput(overrideInput) {
+  return (overrideInput || document.getElementById("input").value).trim() || "[INPUT]";
 }
 
-function buildPrompt(mode) {
-  return prompts[mode].replace("{{input}}", getInput());
+function buildPrompt(mode, overrideInput) {
+  return prompts[mode].replace("{{input}}", getInput(overrideInput));
 }
 
 function setActiveMode(mode) {
@@ -67,10 +67,10 @@ function setActiveMode(mode) {
   });
 }
 
-async function run(mode) {
+async function run(mode, overrideInput) {
   setActiveMode(mode);
 
-  const prompt = buildPrompt(mode);
+  const prompt = buildPrompt(mode, overrideInput);
   document.getElementById("prompt").innerText = prompt;
   output("Running...");
 
@@ -132,6 +132,33 @@ async function copyPrompt() {
 async function copyOutput() {
   const text = document.getElementById("output").innerText;
   await copyText(text, document.getElementById("output"));
+}
+
+function markPosted() {
+  const content = document.getElementById("output").innerText.trim();
+
+  if (!content || content === "Running...") {
+    document.getElementById("postStatus").innerText = "Nothing to post";
+    return;
+  }
+
+  const postedAt = new Date().toISOString();
+  localStorage.setItem("atlasLoopLastPost", JSON.stringify({ content, postedAt }));
+  document.getElementById("postStatus").innerText = "Posted";
+}
+
+function analyzeMetrics() {
+  const lastPost = JSON.parse(localStorage.getItem("atlasLoopLastPost") || "{}");
+  const metricsInput = `Posted content:
+${lastPost.content || document.getElementById("output").innerText}
+
+Metrics:
+Likes: ${document.getElementById("likes").value || "0"}
+Saves: ${document.getElementById("saves").value || "0"}
+Shares: ${document.getElementById("shares").value || "0"}
+Comments: ${document.getElementById("comments").value || "0"}`;
+
+  run("loop", metricsInput);
 }
 
 document.getElementById("input").addEventListener("input", () => {

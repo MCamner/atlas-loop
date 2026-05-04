@@ -120,9 +120,20 @@ button.is-active {
 }
 
 label,
-.output-header {
+.output-header,
+.metrics-panel > span {
   color: var(--muted);
   font-size: 13px;
+}
+
+input {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #0c0e10;
+  color: var(--text);
+  font: inherit;
+  padding: 0 10px;
 }
 
 textarea,
@@ -157,8 +168,35 @@ pre {
   white-space: pre-wrap;
 }
 
+.publish-panel,
+.metrics-panel {
+  display: grid;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+#postStatus {
+  color: var(--accent-2);
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.metrics-panel button {
+  justify-self: start;
+  padding: 0 14px;
+}
+
 @media (max-width: 760px) {
   .loop {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
   }
 }

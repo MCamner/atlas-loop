@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>atlas-loop</title>
+  <meta name="description" content="A minimal command surface for content systems.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">content systems / iteration loop</p>
+      <h1>ATLAS LOOP</h1>
+      <p class="tagline">Ideas -> Execution -> Feedback -> Iteration</p>
+    </header>
+
+    <section class="loop" aria-label="Core loop">
+      <span>IDEAS</span>
+      <span>CONTENT</span>
+      <span>POST</span>
+      <span>ANALYZE</span>
+      <span>OPTIMIZE</span>
+      <span>REPEAT</span>
+    </section>
+
+    <section class="workspace">
+      <div class="controls" aria-label="Actions">
+        <button type="button" onclick="runIdeas()">Ideas</button>
+        <button type="button" onclick="runContent()">Content</button>
+        <button type="button" onclick="runOptimize()">Optimize</button>
+        <button type="button" onclick="runLoop()">Analyze</button>
+      </div>
+
+      <label for="input">Input</label>
+      <textarea id="input" placeholder="Paste a topic, draft, or performance notes..."></textarea>
+
+      <div class="output-header">
+        <span>Output</span>
+        <button type="button" onclick="copyOutput()">Copy</button>
+      </div>
+      <pre id="output">Select a command to start the loop.</pre>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -2,6 +2,8 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 
+await loadLocalEnv();
+
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 8787);
 const DOCS_DIR = new URL("./docs/", import.meta.url).pathname;
@@ -13,6 +15,36 @@ const contentTypes = {
   ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8"
 };
+
+async function loadLocalEnv() {
+  try {
+    const envPath = new URL("./.env", import.meta.url);
+    const content = await readFile(envPath, "utf8");
+
+    for (const line of content.split(/\r?\n/)) {
+      const trimmed = line.trim();
+
+      if (!trimmed || trimmed.startsWith("#")) {
+        continue;
+      }
+
+      const equalsIndex = trimmed.indexOf("=");
+
+      if (equalsIndex === -1) {
+        continue;
+      }
+
+      const key = trimmed.slice(0, equalsIndex).trim();
+      const value = trimmed.slice(equalsIndex + 1).trim().replace(/^["']|["']$/g, "");
+
+      if (key && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  } catch {
+    // A local .env file is optional.
+  }
+}
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8" });

@@ -46,10 +46,22 @@ http://127.0.0.1:8000/
 
 ## Run The Engine
 
-For direct AI output, run the local server with an OpenAI API key:
+For direct AI output, create a local `.env` file:
 
 ```bash
-export OPENAI_API_KEY="your_api_key_here"
+cp .env.example .env
+```
+
+Then edit `.env`:
+
+```text
+OPENAI_API_KEY="your_api_key_here"
+OPENAI_MODEL="gpt-5.2"
+```
+
+Start the engine:
+
+```bash
 npm start
 ```
 
@@ -61,12 +73,7 @@ http://127.0.0.1:8787/
 
 The browser sends prompts to the local `/api/run` endpoint. The API key stays
 in the server process and is never stored in the static GitHub Pages app.
-
-Optional:
-
-```bash
-export OPENAI_MODEL="gpt-5.2"
-```
+The `.env` file is ignored by git.
 
 ## Use The CLI
 

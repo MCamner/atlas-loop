@@ -49,14 +49,72 @@ Return:
 - next post to test`
 };
 
+const presetConfigs = {
+  system: `Preset: SYSTEM / TECH
+Style:
+- clear
+- structured
+- system thinking
+- no fluff
+
+Audience:
+- architects
+- builders
+- technical thinkers
+
+Goal:
+- teach
+- clarify complexity
+- show thinking`,
+
+  art: `Preset: BLACK IRIS / ART
+Style:
+- minimal
+- conceptual
+- slightly abstract
+- editorial tone
+
+Audience:
+- art / culture
+- thinkers
+
+Goal:
+- provoke thought
+- create atmosphere
+- not explain too much`,
+
+  linkedin: `Preset: LINKEDIN / POSITIONING
+Style:
+- sharp
+- confident
+- insight-driven
+- slightly provocative
+
+Audience:
+- professionals
+- decision makers
+
+Goal:
+- authority
+- clarity
+- engagement`
+};
+
 let activeMode = "ideas";
 
 function getInput(overrideInput) {
   return (overrideInput || document.getElementById("input").value).trim() || "[INPUT]";
 }
 
+function getPresetText() {
+  const preset = document.getElementById("preset").value;
+  return presetConfigs[preset] || presetConfigs.system;
+}
+
 function buildPrompt(mode, overrideInput) {
-  return prompts[mode].replace("{{input}}", getInput(overrideInput));
+  return `${getPresetText()}
+
+${prompts[mode].replace("{{input}}", getInput(overrideInput))}`;
 }
 
 function setActiveMode(mode) {
@@ -162,6 +220,10 @@ Comments: ${document.getElementById("comments").value || "0"}`;
 }
 
 document.getElementById("input").addEventListener("input", () => {
+  document.getElementById("prompt").innerText = buildPrompt(activeMode);
+});
+
+document.getElementById("preset").addEventListener("change", () => {
   document.getElementById("prompt").innerText = buildPrompt(activeMode);
 });
 

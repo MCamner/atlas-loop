@@ -126,6 +126,7 @@ label,
   font-size: 13px;
 }
 
+select,
 input {
   min-height: 40px;
   width: 100%;

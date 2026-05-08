@@ -4,7 +4,6 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROMPT_DIR="$ROOT_DIR/docs/prompts"
 
-# Prints usage information.
 usage() {
   cat <<'USAGE'
 Usage: atlas-loop {ideas|hook|content|optimize|crit|loop|patterns}
@@ -22,7 +21,6 @@ Commands:
 USAGE
 }
 
-# Shows prompt.
 show_prompt() {
   local name="$1"
   local input="${2:-}"

@@ -179,7 +179,13 @@ create_release_commit_and_tag() {
   local tag="v${version}"
 
   git add "${VERSION_FILE}" "${README_FILE}" "${CHANGELOG_FILE}"
-  git commit -m "Prepare ${tag} release"
+
+  if git diff --cached --quiet; then
+    log_step "Release files already up to date; tagging current commit"
+  else
+    git commit -m "Prepare ${tag} release"
+  fi
+
   git tag -a "${tag}" -m "${tag}"
 }
 

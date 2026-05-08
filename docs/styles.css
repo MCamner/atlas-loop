@@ -121,7 +121,7 @@ button.is-active {
 
 label,
 .output-header,
-.metrics-panel > span {
+.brief-panel > span {
   color: var(--muted);
   font-size: 13px;
 }
@@ -170,7 +170,10 @@ pre {
 }
 
 .publish-panel,
+.brief-panel,
 .metrics-panel,
+.queue-panel,
+.patterns-panel,
 .history-panel {
   display: grid;
   gap: 12px;
@@ -188,9 +191,20 @@ pre {
   align-items: center;
 }
 
+.brief-grid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
 .metrics-panel button {
   justify-self: start;
   padding: 0 14px;
+}
+
+#signalScore {
+  color: var(--accent-2);
 }
 
 .history-list {
@@ -217,12 +231,17 @@ pre {
   line-height: 1.4;
 }
 
+.history-item.is-done {
+  opacity: 0.62;
+}
+
 @media (max-width: 760px) {
   .loop {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .metrics-grid {
+  .metrics-grid,
+  .brief-grid {
     grid-template-columns: 1fr;
   }
 }

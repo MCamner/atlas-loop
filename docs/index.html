@@ -36,10 +36,29 @@
         <span>Mode</span>
         <div class="controls" aria-label="Mode">
           <button type="button" data-mode="ideas" onclick="runIdeas()">Ideas</button>
+          <button type="button" data-mode="hook" onclick="runHookLab()">Hook Lab</button>
           <button type="button" data-mode="content" onclick="runContent()">Content</button>
           <button type="button" data-mode="crit" onclick="runCrit()">Crit</button>
           <button type="button" data-mode="optimize" onclick="runOptimize()">Optimize</button>
           <button type="button" data-mode="loop" onclick="runLoop()">Analyze</button>
+        </div>
+      </div>
+
+      <div class="brief-panel">
+        <span>Experiment Brief</span>
+        <div class="brief-grid">
+          <label for="audience">Audience</label>
+          <input id="audience" placeholder="EUC operators, builders, artists...">
+          <label for="pillar">Pillar</label>
+          <input id="pillar" placeholder="Troubleshooting, AI workflows, art...">
+          <label for="hypothesis">Hypothesis</label>
+          <input id="hypothesis" placeholder="If the hook is concrete, saves should rise.">
+          <label for="format">Format</label>
+          <input id="format" placeholder="Reel, carousel, story, caption...">
+          <label for="metricToWin">Metric to win</label>
+          <input id="metricToWin" placeholder="Save rate, shares, follows...">
+          <label for="risk">Risk</label>
+          <input id="risk" placeholder="Too abstract, too long, weak proof...">
         </div>
       </div>
 
@@ -70,7 +89,10 @@
       </div>
 
       <div class="metrics-panel">
-        <span>Metrics</span>
+        <div class="output-header">
+          <span>Metrics</span>
+          <span id="signalScore">Signal Score: 0</span>
+        </div>
         <div class="metrics-grid">
           <label for="reach">Reach</label>
           <input id="reach" inputmode="numeric" placeholder="0">
@@ -90,6 +112,22 @@
           <input id="profileVisits" inputmode="numeric" placeholder="0">
         </div>
         <button type="button" onclick="analyzeMetrics()">Analyze Performance</button>
+      </div>
+
+      <div class="queue-panel">
+        <div class="output-header">
+          <span>Next Test Queue</span>
+          <button type="button" onclick="addManualNextTest()">Add Output</button>
+        </div>
+        <div id="nextQueue" class="history-list">No next tests yet.</div>
+      </div>
+
+      <div class="patterns-panel">
+        <div class="output-header">
+          <span>Winner Patterns</span>
+          <button type="button" onclick="analyzeWinnerPatterns()">Analyze Winners</button>
+        </div>
+        <pre id="patterns">Save posts with metrics to extract repeatable patterns.</pre>
       </div>
 
       <div class="history-panel">

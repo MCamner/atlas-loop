@@ -31,11 +31,16 @@ the local loop history.
 ## What It Does
 
 - generates Instagram ideas from a topic
+- creates Hook Lab variants for the first 1-2 seconds of a Reel
 - turns a goal into Reel, carousel, caption, CTA, and hashtag drafts
 - critiques drafts before posting
 - improves drafts for retention, saves, shares, comments, and action
+- attaches an experiment brief: audience, pillar, hypothesis, format, metric, risk
 - tracks reach, plays, likes, saves, shares, comments, follows, and profile visits
 - calculates save, share, comment, and follow rates from reach
+- scores posts with a lightweight Signal Score
+- keeps a Next Test Queue after analysis
+- extracts winner patterns from the best saved experiments
 - stores recent posts locally so you can compare signals and repeat what works
 
 ## Run The UI
@@ -94,10 +99,12 @@ The `.env` file is ignored by git.
 ```bash
 chmod +x cli/atlas-loop.sh
 ./cli/atlas-loop.sh ideas
+./cli/atlas-loop.sh hook
 ./cli/atlas-loop.sh content
 ./cli/atlas-loop.sh crit
 ./cli/atlas-loop.sh optimize
 ./cli/atlas-loop.sh loop
+./cli/atlas-loop.sh patterns
 ```
 
 The CLI can also fill the prompt from an argument or stdin:
@@ -111,10 +118,12 @@ echo "Draft caption here" | ./cli/atlas-loop.sh crit
 
 ```text
 /ideas -> generate Instagram ideas
+/hook -> generate and compare opening hooks
 /content -> create Reels, captions, and CTAs
 /crit -> review draft clarity, proof, and retention
 /optimize -> improve Instagram content
 /loop -> analyze Instagram performance
+/patterns -> extract repeatable winning patterns
 ```
 
 ## Structure

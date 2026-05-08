@@ -6,16 +6,18 @@ PROMPT_DIR="$ROOT_DIR/docs/prompts"
 
 usage() {
   cat <<'USAGE'
-Usage: atlas-loop {ideas|content|optimize|crit|loop}
-       atlas-loop {ideas|content|optimize|crit|loop} "your input"
-       echo "your input" | atlas-loop {ideas|content|optimize|crit|loop}
+Usage: atlas-loop {ideas|hook|content|optimize|crit|loop|patterns}
+       atlas-loop {ideas|hook|content|optimize|crit|loop|patterns} "your input"
+       echo "your input" | atlas-loop {ideas|hook|content|optimize|crit|loop|patterns}
 
 Commands:
   ideas      Generate directions and angles
+  hook       Generate and score opening hooks
   content    Turn a goal into content
   optimize   Improve a draft
   crit       Review a draft
   loop       Analyze feedback and repeat signals
+  patterns   Extract repeatable patterns from experiments
 USAGE
 }
 
@@ -55,6 +57,9 @@ case "$command" in
   ideas)
     show_prompt "ideas" "$input"
     ;;
+  hook | hooks)
+    show_prompt "hook" "$input"
+    ;;
   content)
     show_prompt "content" "$input"
     ;;
@@ -66,6 +71,9 @@ case "$command" in
     ;;
   loop | analyze)
     show_prompt "loop" "$input"
+    ;;
+  patterns | winners)
+    show_prompt "patterns" "$input"
     ;;
   *)
     usage

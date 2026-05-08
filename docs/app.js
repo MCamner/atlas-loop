@@ -27,6 +27,18 @@ Include:
 - CTA
 - suggested hashtags`,
 
+  crit: `Review this Instagram content with practical, direct feedback:
+
+{{input}}
+
+Return:
+- strongest part
+- weakest part
+- unclear claims
+- missing proof
+- weak retention points
+- one concrete improvement`,
+
   optimize: `Improve this Instagram content:
 
 {{input}}
@@ -46,6 +58,7 @@ Return:
 - what worked
 - what failed
 - what to repeat
+- metric signal quality
 - next post to test`
 };
 
@@ -101,6 +114,8 @@ Goal:
 };
 
 let activeMode = "ideas";
+const historyKey = "atlasLoopPosts";
+const lastPostKey = "atlasLoopLastPost";
 
 function getInput(overrideInput) {
   return (overrideInput || document.getElementById("input").value).trim() || "[INPUT]";
@@ -140,16 +155,30 @@ async function run(mode, overrideInput) {
     });
 
     if (!response.ok) {
-      throw new Error(await response.text());
+      const errorText = await response.text();
+      throw new Error(readApiError(errorText));
     }
 
     const data = await response.json();
-    output(data.output || "No output returned.");
+    const result = data.output || "No output returned.";
+    output(result);
+    return result;
   } catch (error) {
-    output(
+    const fallback = (
       "-> Copy this prompt into ChatGPT\n\n" +
-        "Engine unavailable in this context. Start the local server with `npm start` and set OPENAI_API_KEY to generate output directly."
+        "Engine unavailable in this context. Start the local server with `npm start` and set OPENAI_API_KEY to generate output directly.\n\n" +
+        `Details: ${error.message}`
     );
+    output(fallback);
+    return fallback;
+  }
+}
+
+function readApiError(errorText) {
+  try {
+    return JSON.parse(errorText).error || errorText;
+  } catch {
+    return errorText || "Request failed.";
   }
 }
 
@@ -159,6 +188,10 @@ function runIdeas() {
 
 function runContent() {
   run("content");
+}
+
+function runCrit() {
+  run("crit");
 }
 
 function runOptimize() {
@@ -179,7 +212,11 @@ async function copyText(text, fallbackTarget) {
     return;
   }
 
-  await navigator.clipboard.writeText(text);
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    fallbackTarget.innerText = `${fallbackTarget.innerText}\n\nCopy failed: ${error.message}`;
+  }
 }
 
 async function copyPrompt() {
@@ -200,23 +237,216 @@ function markPosted() {
     return;
   }
 
-  const postedAt = new Date().toISOString();
-  localStorage.setItem("atlasLoopLastPost", JSON.stringify({ content, postedAt }));
+  const post = {
+    id: createId(),
+    content,
+    input: document.getElementById("input").value.trim(),
+    prompt: document.getElementById("prompt").innerText,
+    mode: activeMode,
+    preset: document.getElementById("preset").value,
+    postedAt: new Date().toISOString(),
+    metrics: null,
+    nextTest: ""
+  };
+
+  const posts = getPosts();
+  posts.unshift(post);
+  savePosts(posts);
+  localStorage.setItem(lastPostKey, JSON.stringify(post));
   document.getElementById("postStatus").innerText = "Posted";
+  renderHistory();
 }
 
-function analyzeMetrics() {
-  const lastPost = JSON.parse(localStorage.getItem("atlasLoopLastPost") || "{}");
+function createId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+async function analyzeMetrics() {
+  const lastPost = JSON.parse(localStorage.getItem(lastPostKey) || "{}");
+  const metrics = readMetrics();
+  const rates = calculateRates(metrics);
+  let activePost = null;
+
+  if (lastPost.id) {
+    const posts = getPosts();
+    const post = posts.find((item) => item.id === lastPost.id);
+
+    if (post) {
+      post.metrics = metrics;
+      activePost = post;
+      savePosts(posts);
+      localStorage.setItem(lastPostKey, JSON.stringify(post));
+      renderHistory();
+    }
+  }
+
   const metricsInput = `Posted content:
 ${lastPost.content || document.getElementById("output").innerText}
 
 Metrics:
-Likes: ${document.getElementById("likes").value || "0"}
-Saves: ${document.getElementById("saves").value || "0"}
-Shares: ${document.getElementById("shares").value || "0"}
-Comments: ${document.getElementById("comments").value || "0"}`;
+Reach: ${metrics.reach}
+Plays: ${metrics.plays}
+Likes: ${metrics.likes}
+Saves: ${metrics.saves}
+Shares: ${metrics.shares}
+Comments: ${metrics.comments}
+Follows: ${metrics.follows}
+Profile visits: ${metrics.profileVisits}
 
-  run("loop", metricsInput);
+Rates:
+Save rate: ${rates.saveRate}
+Share rate: ${rates.shareRate}
+Comment rate: ${rates.commentRate}
+Follow conversion: ${rates.followRate}
+
+Return one concrete next post to test.`;
+
+  const analysis = await run("loop", metricsInput);
+
+  if (activePost) {
+    const posts = getPosts();
+    const post = posts.find((item) => item.id === activePost.id);
+
+    if (post) {
+      post.analysis = analysis;
+      post.nextTest = extractNextTest(analysis);
+      savePosts(posts);
+      localStorage.setItem(lastPostKey, JSON.stringify(post));
+      renderHistory();
+    }
+  }
+}
+
+function readMetric(id) {
+  const value = Number.parseInt(document.getElementById(id).value, 10);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function readMetrics() {
+  return {
+    reach: readMetric("reach"),
+    plays: readMetric("plays"),
+    likes: readMetric("likes"),
+    saves: readMetric("saves"),
+    shares: readMetric("shares"),
+    comments: readMetric("comments"),
+    follows: readMetric("follows"),
+    profileVisits: readMetric("profileVisits")
+  };
+}
+
+function calculateRates(metrics) {
+  const reach = metrics.reach || 1;
+
+  return {
+    saveRate: formatRate(metrics.saves, reach),
+    shareRate: formatRate(metrics.shares, reach),
+    commentRate: formatRate(metrics.comments, reach),
+    followRate: formatRate(metrics.follows, reach)
+  };
+}
+
+function formatRate(value, base) {
+  return `${((value / base) * 100).toFixed(2)}%`;
+}
+
+function getPosts() {
+  try {
+    const posts = JSON.parse(localStorage.getItem(historyKey) || "[]");
+    return Array.isArray(posts) ? posts : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePosts(posts) {
+  localStorage.setItem(historyKey, JSON.stringify(posts.slice(0, 50)));
+}
+
+function renderHistory() {
+  const history = document.getElementById("history");
+  const posts = getPosts();
+
+  if (!posts.length) {
+    history.innerText = "No saved posts yet.";
+    return;
+  }
+
+  history.innerHTML = posts
+    .slice(0, 8)
+    .map((post) => {
+      const metrics = post.metrics;
+      const postedAt = new Date(post.postedAt).toLocaleString();
+      const title = escapeHtml(firstLine(post.content));
+      const detail = metrics
+        ? `Reach ${metrics.reach} / Saves ${metrics.saves} / Shares ${metrics.shares} / Comments ${metrics.comments}`
+        : "No metrics yet";
+      const nextTest = post.nextTest ? `<small>Next: ${escapeHtml(post.nextTest)}</small>` : "";
+
+      return `<button type="button" class="history-item" onclick="loadPost('${post.id}')">
+        <span>${title}</span>
+        <small>${postedAt} / ${post.preset} / ${detail}</small>
+        ${nextTest}
+      </button>`;
+    })
+    .join("");
+}
+
+function extractNextTest(text) {
+  const match = text.match(/next(?:\s+post)?(?:\s+to)?\s+test[:\-\s]+(.+)/i);
+  return match ? match[1].trim().slice(0, 140) : "";
+}
+
+function firstLine(text) {
+  return text.split(/\r?\n/).find(Boolean)?.slice(0, 90) || "Untitled post";
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, (character) => {
+    const entities = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    };
+
+    return entities[character];
+  });
+}
+
+function loadPost(id) {
+  const post = getPosts().find((item) => item.id === id);
+
+  if (!post) {
+    return;
+  }
+
+  document.getElementById("input").value = post.input || "";
+  document.getElementById("prompt").innerText = post.prompt || buildPrompt(post.mode || activeMode);
+  output(post.content);
+  document.getElementById("preset").value = post.preset || "system";
+  setActiveMode(post.mode || "content");
+  localStorage.setItem(lastPostKey, JSON.stringify(post));
+  document.getElementById("postStatus").innerText = "Loaded saved post";
+
+  if (post.metrics) {
+    Object.entries(post.metrics).forEach(([key, value]) => {
+      const input = document.getElementById(key);
+
+      if (input) {
+        input.value = value || "";
+      }
+    });
+  }
+}
+
+async function exportHistory() {
+  await copyText(JSON.stringify(getPosts(), null, 2), document.getElementById("history"));
 }
 
 document.getElementById("input").addEventListener("input", () => {
@@ -229,3 +459,4 @@ document.getElementById("preset").addEventListener("change", () => {
 
 setActiveMode(activeMode);
 document.getElementById("prompt").innerText = buildPrompt(activeMode);
+renderHistory();

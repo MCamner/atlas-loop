@@ -170,7 +170,8 @@ pre {
 }
 
 .publish-panel,
-.metrics-panel {
+.metrics-panel,
+.history-panel {
   display: grid;
   gap: 12px;
   padding-top: 4px;
@@ -190,6 +191,30 @@ pre {
 .metrics-panel button {
   justify-self: start;
   padding: 0 14px;
+}
+
+.history-list {
+  display: grid;
+  gap: 8px;
+}
+
+.history-item {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  min-height: 0;
+  padding: 12px;
+  text-align: left;
+}
+
+.history-item span,
+.history-item small {
+  overflow-wrap: anywhere;
+}
+
+.history-item small {
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 @media (max-width: 760px) {

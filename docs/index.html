@@ -37,6 +37,7 @@
         <div class="controls" aria-label="Mode">
           <button type="button" data-mode="ideas" onclick="runIdeas()">Ideas</button>
           <button type="button" data-mode="content" onclick="runContent()">Content</button>
+          <button type="button" data-mode="crit" onclick="runCrit()">Crit</button>
           <button type="button" data-mode="optimize" onclick="runOptimize()">Optimize</button>
           <button type="button" data-mode="loop" onclick="runLoop()">Analyze</button>
         </div>
@@ -71,6 +72,10 @@
       <div class="metrics-panel">
         <span>Metrics</span>
         <div class="metrics-grid">
+          <label for="reach">Reach</label>
+          <input id="reach" inputmode="numeric" placeholder="0">
+          <label for="plays">Plays</label>
+          <input id="plays" inputmode="numeric" placeholder="0">
           <label for="likes">Likes</label>
           <input id="likes" inputmode="numeric" placeholder="0">
           <label for="saves">Saves</label>
@@ -79,8 +84,20 @@
           <input id="shares" inputmode="numeric" placeholder="0">
           <label for="comments">Comments</label>
           <input id="comments" inputmode="numeric" placeholder="0">
+          <label for="follows">Follows</label>
+          <input id="follows" inputmode="numeric" placeholder="0">
+          <label for="profileVisits">Profile visits</label>
+          <input id="profileVisits" inputmode="numeric" placeholder="0">
         </div>
         <button type="button" onclick="analyzeMetrics()">Analyze Performance</button>
+      </div>
+
+      <div class="history-panel">
+        <div class="output-header">
+          <span>Loop History</span>
+          <button type="button" onclick="exportHistory()">Export JSON</button>
+        </div>
+        <div id="history" class="history-list">No saved posts yet.</div>
       </div>
     </section>
   </main>

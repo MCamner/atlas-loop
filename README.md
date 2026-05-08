@@ -25,7 +25,18 @@ The same loop appears in the UI, CLI, prompts, and examples so the repo feels
 like one system instead of scattered files.
 
 The UI includes a minimal publish flow: copy content, mark it as posted, track
-Instagram metrics, then analyze performance to choose the next test.
+Instagram metrics, analyze performance, and save each post as an experiment in
+the local loop history.
+
+## What It Does
+
+- generates Instagram ideas from a topic
+- turns a goal into Reel, carousel, caption, CTA, and hashtag drafts
+- critiques drafts before posting
+- improves drafts for retention, saves, shares, comments, and action
+- tracks reach, plays, likes, saves, shares, comments, follows, and profile visits
+- calculates save, share, comment, and follow rates from reach
+- stores recent posts locally so you can compare signals and repeat what works
 
 ## Run The UI
 
@@ -84,8 +95,16 @@ The `.env` file is ignored by git.
 chmod +x cli/atlas-loop.sh
 ./cli/atlas-loop.sh ideas
 ./cli/atlas-loop.sh content
+./cli/atlas-loop.sh crit
 ./cli/atlas-loop.sh optimize
 ./cli/atlas-loop.sh loop
+```
+
+The CLI can also fill the prompt from an argument or stdin:
+
+```bash
+./cli/atlas-loop.sh ideas "endpoint troubleshooting for EUC operators"
+echo "Draft caption here" | ./cli/atlas-loop.sh crit
 ```
 
 ## Demo
@@ -93,6 +112,7 @@ chmod +x cli/atlas-loop.sh
 ```text
 /ideas -> generate Instagram ideas
 /content -> create Reels, captions, and CTAs
+/crit -> review draft clarity, proof, and retention
 /optimize -> improve Instagram content
 /loop -> analyze Instagram performance
 ```

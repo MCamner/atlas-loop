@@ -7,6 +7,8 @@ PROMPT_DIR="$ROOT_DIR/docs/prompts"
 usage() {
   cat <<'USAGE'
 Usage: atlas-loop {ideas|content|optimize|crit|loop}
+       atlas-loop {ideas|content|optimize|crit|loop} "your input"
+       echo "your input" | atlas-loop {ideas|content|optimize|crit|loop}
 
 Commands:
   ideas      Generate directions and angles
@@ -19,6 +21,7 @@ USAGE
 
 show_prompt() {
   local name="$1"
+  local input="${2:-}"
   local file="$PROMPT_DIR/$name.md"
 
   if [[ ! -f "$file" ]]; then
@@ -28,24 +31,41 @@ show_prompt() {
 
   echo "Running $name..."
   echo
-  sed -n '1,200p' "$file"
+
+  if [[ -z "$input" && ! -t 0 ]]; then
+    input="$(cat)"
+  fi
+
+  if [[ -n "$input" ]]; then
+    INPUT="$input" perl -0pe 's/\[INPUT\]/$ENV{INPUT}/g' "$file"
+  else
+    sed -n '1,200p' "$file"
+  fi
 }
 
-case "${1:-}" in
+command="${1:-}"
+
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+
+input="${*:-}"
+
+case "$command" in
   ideas)
-    show_prompt "ideas"
+    show_prompt "ideas" "$input"
     ;;
   content)
-    show_prompt "content"
+    show_prompt "content" "$input"
     ;;
   optimize)
-    show_prompt "optimize"
+    show_prompt "optimize" "$input"
     ;;
   crit)
-    show_prompt "crit"
+    show_prompt "crit" "$input"
     ;;
   loop | analyze)
-    show_prompt "loop"
+    show_prompt "loop" "$input"
     ;;
   *)
     usage

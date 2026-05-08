@@ -8,6 +8,7 @@ const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || 8787);
 const DOCS_DIR = new URL("./docs/", import.meta.url).pathname;
 const MODEL = process.env.OPENAI_MODEL || "gpt-5.5";
+const MAX_BODY_BYTES = 200_000;
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -53,8 +54,15 @@ function sendJson(res, statusCode, payload) {
 
 async function readRequestBody(req) {
   const chunks = [];
+  let size = 0;
 
   for await (const chunk of req) {
+    size += chunk.length;
+
+    if (size > MAX_BODY_BYTES) {
+      throw new Error("Request body too large.");
+    }
+
     chunks.push(chunk);
   }
 
@@ -71,13 +79,28 @@ async function runPrompt(req, res) {
 
   try {
     payload = JSON.parse(await readRequestBody(req));
-  } catch {
+  } catch (error) {
+    if (error.message === "Request body too large.") {
+      sendJson(res, 413, { error: error.message });
+      return;
+    }
+
     sendJson(res, 400, { error: "Invalid JSON body." });
     return;
   }
 
   if (!payload.prompt || typeof payload.prompt !== "string") {
     sendJson(res, 400, { error: "Missing prompt." });
+    return;
+  }
+
+  if (payload.prompt.length > MAX_BODY_BYTES) {
+    sendJson(res, 413, { error: "Prompt is too large." });
+    return;
+  }
+
+  if (payload.mode && typeof payload.mode !== "string") {
+    sendJson(res, 400, { error: "Invalid mode." });
     return;
   }
 
@@ -103,8 +126,8 @@ async function runPrompt(req, res) {
     }
 
     sendJson(res, 200, { output: data.output_text || "" });
-  } catch (error) {
-    sendJson(res, 500, { error: error.message || "Engine request failed." });
+  } catch {
+    sendJson(res, 500, { error: "Engine request failed." });
   }
 }
 
@@ -133,8 +156,13 @@ async function serveStatic(req, res) {
 }
 
 createServer(async (req, res) => {
-  if (req.method === "POST" && req.url === "/api/run") {
-    await runPrompt(req, res);
+  if (req.url === "/api/run") {
+    if (req.method === "POST") {
+      await runPrompt(req, res);
+      return;
+    }
+
+    sendJson(res, 405, { error: "Method not allowed." });
     return;
   }
 

@@ -11,4 +11,5 @@ Return:
 - what worked
 - what failed
 - what to repeat
+- metric signal quality
 - next post to test

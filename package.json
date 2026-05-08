@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "check": "node --check server.mjs && bash -n cli/atlas-loop.sh && bash -n release.sh"
   },
   "engines": {
     "node": ">=18"

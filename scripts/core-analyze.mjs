@@ -27,9 +27,10 @@
 // asked.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 export const DEFAULT_TASK =
   "Analyze which Instagram experiments had the strongest save and share rates, and why";
@@ -123,6 +124,12 @@ function atlas(bin, args, env) {
 
 export function analyze(history, { task = DEFAULT_TASK, workdir, bin, env = process.env } = {}) {
   validateHistory(history);
+  // Core's argument parser would read a task starting with "-" as an option
+  // ("--unsafe-legacy-unbounded" is one), and its bounded CLI does not accept
+  // "--" before the task. So such a task is refused, not passed.
+  if (typeof task !== "string" || !task.trim() || task.startsWith("-")) {
+    throw new HistoryRefused("the task must be non-empty text that does not start with '-'");
+  }
   const atlasBin = bin || env.ATLAS_BIN || "atlas";
   const coreEnv = coreEnvironment(env);
   // Always a fresh directory of our own: --workdir names where to put it,
@@ -198,7 +205,10 @@ function main(argv) {
   process.stdout.write(`${JSON.stringify(analyze(history, options), null, 2)}\n`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Compared as URLs of the real path: import.meta.url is percent-encoded (a
+// space is %20) and has symlinks resolved, so comparing it to argv[1] as a
+// string made the script exit 0 without doing anything.
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   try {
     main(process.argv.slice(2));
   } catch (error) {

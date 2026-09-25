@@ -5,7 +5,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileS
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  HistoryRefused, analyze, coreEnvironment, renderWorkspace, validateHistory,
+  DEFAULT_TASK, HistoryRefused, analyze, coreEnvironment, renderWorkspace, validateHistory,
 } from "../scripts/core-analyze.mjs";
 
 const HISTORY = JSON.parse(readFileSync(new URL("../examples/history-export.json", import.meta.url)));
@@ -50,6 +50,7 @@ test("Core is called create -> run -> inspect, without a shell, read-only", () =
   const calls = atlas.calls();
   assert.deepEqual(calls.map((c) => c.argv[0]), ["create", "run", "inspect"]);
   const run = calls[1].argv;
+  assert.equal(run[1], DEFAULT_TASK);
   assert.equal(run[run.indexOf("--repo-path") + 1], out.workspace);
   assert.ok(out.workspace.startsWith(join(atlas.dir, "atlas-loop-core-")));
   assert.equal(run[run.indexOf("--run-id") + 1], "run-1");
@@ -138,4 +139,23 @@ test("a run document for another run is refused even when inspect is right", () 
     /atlas-run\.v1 for run-1/);
   const calls = atlas.calls().map((c) => c.argv[0]);
   assert.deepEqual(calls, ["create", "run", "inspect"]);
+});
+
+test("a task that looks like an option is refused before Core is called", () => {
+  for (const task of ["--unsafe-legacy-unbounded", "-h", "", "   "]) {
+    const atlas = fakeAtlas();
+    assert.throws(() => analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, task }), HistoryRefused);
+    assert.equal(existsSync(join(atlas.dir, "calls.jsonl")), false);
+  }
+});
+
+test("the script runs from a path with a space", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const { copyFileSync } = await import("node:fs");
+  const dir = mkdtempSync(join(tmpdir(), "dir with space-"));
+  const copy = join(dir, "core-analyze.mjs");
+  copyFileSync(new URL("../scripts/core-analyze.mjs", import.meta.url), copy);
+  const result = spawnSync(process.execPath, [copy], { encoding: "utf8" });
+  assert.equal(result.status, 1, "must reach main() and print usage, not exit 0 silently");
+  assert.match(result.stderr, /usage: core-analyze\.mjs/);
 });

@@ -128,6 +128,9 @@ directly), or else under the system temp directory.
 node scripts/core-analyze.mjs history.json [--task "..."] [--workdir DIR]
 ```
 
+A `--task` that starts with `-` is refused, because Core would read it as an
+option.
+
 `history.json` is what **Export history** copies. The script writes every
 experiment into one `README.md` in a fresh workspace, then calls
 `atlas create`, `atlas run --repo-path WORKSPACE --json` and `atlas inspect`.

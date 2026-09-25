@@ -114,6 +114,49 @@ The CLI can also fill the prompt from an argument or stdin:
 echo "Draft caption here" | ./cli/atlas-loop.sh crit
 ```
 
+## Analyze With Atlas Core
+
+`scripts/core-analyze.mjs` hands exported experiments to
+[Atlas Core](https://github.com/MCamner/atlas-core) for analysis. It is
+read-only with respect to the experiment history and publishing: it posts
+nothing and opens no network connection. It writes only a new directory of its
+own, holding the workspace and Core's event log. That directory is created
+under `--workdir` if given (an existing directory, never written into
+directly), or else under the system temp directory.
+
+```bash
+node scripts/core-analyze.mjs history.json [--task "..."] [--workdir DIR]
+```
+
+A `--task` that starts with `-` is refused, because Core would read it as an
+option.
+
+`history.json` is what **Export history** copies. The script writes every
+experiment into one `README.md` in a fresh workspace, then calls
+`atlas create`, `atlas run --repo-path WORKSPACE --json` and `atlas inspect`.
+`atlas` must be on `PATH`, or set `ATLAS_BIN`. Only Core's own documents are
+read: a run document that is not `atlas-run.v1`, or an inspection that is not
+`atlas-inspect.v1`, each for the run id `atlas create` just issued, fails
+closed with exit 1. It prints one
+JSON document
+with Core's run id, status, stop reason, the sources Core read (path and
+SHA-256), and the paths to the workspace and event log.
+
+**Measurement stays with atlas-loop.** Rates and Signal Score are copied as
+the UI recorded them; the script computes nothing, and a test fails if the
+formula note drifts from `docs/app.js`.
+
+**Publishing stays with atlas-loop.** Core runs with only `PATH`, `HOME`,
+`LANG`, `LC_ALL` and `TMPDIR`. `OPENAI_API_KEY` and anything else in `.env`
+never reach it. Nothing is ever passed through a shell.
+
+**What Core adds is the record.** You get which sources Core read, their
+digests, and an evidence-checked run document. Core's CLI has no live model,
+so without one it writes its rule-based review and checks no claims about the
+experiments.
+
+`npm test` runs the contract against a fake `atlas`.
+
 ## Demo
 
 ```text

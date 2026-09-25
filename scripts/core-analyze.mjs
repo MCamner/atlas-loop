@@ -153,9 +153,9 @@ export function analyze(history, { task = DEFAULT_TASK, workdir, bin, env = proc
   // Only Core's own documents are read. Anything else — no document, another
   // schema, a later version this client does not know — is refused rather
   // than read field by field.
-  if (document?.schema !== "atlas-run.v1") {
+  if (document?.schema !== "atlas-run.v1" || document.run_id !== runId) {
     throw new HistoryRefused(
-      `atlas run did not return atlas-run.v1 (exit ${run.status}): ${run.stderr.trim().slice(0, 300)}`);
+      `atlas run did not return atlas-run.v1 for ${runId} (exit ${run.status}): ${run.stderr.trim().slice(0, 300)}`);
   }
   if (inspection?.schema !== "atlas-inspect.v1" || inspection.run_id !== runId) {
     throw new HistoryRefused(

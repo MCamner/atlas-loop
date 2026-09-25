@@ -132,8 +132,9 @@ node scripts/core-analyze.mjs history.json [--task "..."] [--workdir DIR]
 experiment into one `README.md` in a fresh workspace, then calls
 `atlas create`, `atlas run --repo-path WORKSPACE --json` and `atlas inspect`.
 `atlas` must be on `PATH`, or set `ATLAS_BIN`. Only Core's own documents are
-read: a run that is not `atlas-run.v1`, or an inspection that is not
-`atlas-inspect.v1` for that run id, fails closed with exit 1. It prints one
+read: a run document that is not `atlas-run.v1`, or an inspection that is not
+`atlas-inspect.v1`, each for the run id `atlas create` just issued, fails
+closed with exit 1. It prints one
 JSON document
 with Core's run id, status, stop reason, the sources Core read (path and
 SHA-256), and the paths to the workspace and event log.

@@ -22,7 +22,8 @@ const [cmd] = process.argv.slice(2);
 if (cmd === "create") console.log("run-1");
 const mode = ${JSON.stringify(mode)};
 if (cmd === "run") console.log(mode === "no-schema" ? JSON.stringify({ evaluations: [] })
-  : JSON.stringify({ schema: "atlas-run.v1", run_id: "run-1", evaluations: [{ passed: true }], outputs: ["ok"] }));
+  : JSON.stringify({ schema: "atlas-run.v1", run_id: mode === "other-run" ? "run-OTHER" : "run-1",
+                     evaluations: [{ passed: true }], outputs: ["ok"] }));
 if (cmd === "inspect") console.log(JSON.stringify({ schema: mode === "bad-inspect" ? "atlas-inspect.v9" : "atlas-inspect.v1",
   run_id: "run-1", status: "done", stop_reason: "passed",
   source_details: [{ path: "README.md", content_sha256: "a".repeat(64), source_id: "s" }], uncertainties: [] }));
@@ -108,7 +109,7 @@ test("the workspace's metric text matches the UI's definitions", () => {
 });
 
 test("only Core's own documents are read: anything else fails closed", () => {
-  for (const mode of ["no-schema", "bad-inspect"]) {
+  for (const mode of ["no-schema", "bad-inspect", "other-run"]) {
     const atlas = fakeAtlas(mode);
     assert.throws(
       () => analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, env: { PATH: process.env.PATH } }),
@@ -128,4 +129,13 @@ test("--workdir is a parent: an existing workspace is never overwritten", () => 
   assert.notEqual(second.workspace, out.workspace);
   assert.throws(() => analyze(HISTORY, { bin: atlas.bin, workdir: join(atlas.dir, "missing") }),
                 HistoryRefused);
+});
+
+test("a run document for another run is refused even when inspect is right", () => {
+  const atlas = fakeAtlas("other-run");
+  assert.throws(
+    () => analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, env: { PATH: process.env.PATH } }),
+    /atlas-run\.v1 for run-1/);
+  const calls = atlas.calls().map((c) => c.argv[0]);
+  assert.deepEqual(calls, ["create", "run", "inspect"]);
 });

@@ -1,7 +1,11 @@
 #!/usr/bin/env node
-// Analyze exported Instagram experiments with Atlas Core. Read-only.
+// Analyze exported Instagram experiments with Atlas Core.
 //
 //   node scripts/core-analyze.mjs HISTORY.json [--task TEXT] [--workdir DIR]
+//
+// Read-only with respect to the experiment history and publishing: it writes
+// only a new directory of its own (under --workdir, or the system temp dir),
+// holding the workspace and Core's event log.
 //
 // HISTORY.json is what the UI's "Export history" copies. Every experiment is
 // written, as atlas-loop recorded it, into one README.md in a fresh workspace,
@@ -23,7 +27,7 @@
 // asked.
 
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -121,7 +125,12 @@ export function analyze(history, { task = DEFAULT_TASK, workdir, bin, env = proc
   validateHistory(history);
   const atlasBin = bin || env.ATLAS_BIN || "atlas";
   const coreEnv = coreEnvironment(env);
-  const root = workdir || mkdtempSync(join(tmpdir(), "atlas-loop-core-"));
+  // Always a fresh directory of our own: --workdir names where to put it,
+  // never a directory to write into, so nothing already there is touched.
+  if (workdir !== undefined && !(existsSync(workdir) && statSync(workdir).isDirectory())) {
+    throw new HistoryRefused(`--workdir is not an existing directory: ${workdir}`);
+  }
+  const root = mkdtempSync(join(workdir ?? tmpdir(), "atlas-loop-core-"));
   const workspace = join(root, "workspace");
   mkdirSync(workspace, { recursive: true });
   writeFileSync(join(workspace, "README.md"), renderWorkspace(history));
@@ -141,8 +150,16 @@ export function analyze(history, { task = DEFAULT_TASK, workdir, bin, env = proc
   let inspection = null;
   try { document = JSON.parse(run.stdout); } catch { document = null; }
   try { inspection = JSON.parse(inspected.stdout); } catch { inspection = null; }
-  if (!inspection) {
-    throw new HistoryRefused(`atlas inspect failed: ${inspected.stderr.trim() || run.stderr.trim()}`);
+  // Only Core's own documents are read. Anything else — no document, another
+  // schema, a later version this client does not know — is refused rather
+  // than read field by field.
+  if (document?.schema !== "atlas-run.v1") {
+    throw new HistoryRefused(
+      `atlas run did not return atlas-run.v1 (exit ${run.status}): ${run.stderr.trim().slice(0, 300)}`);
+  }
+  if (inspection?.schema !== "atlas-inspect.v1" || inspection.run_id !== runId) {
+    throw new HistoryRefused(
+      `atlas inspect did not return atlas-inspect.v1 for ${runId}: ${inspected.stderr.trim().slice(0, 300)}`);
   }
   const evaluations = document?.evaluations ?? [];
   return {

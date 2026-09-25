@@ -1,7 +1,7 @@
 // node --test: atlas-loop hands its experiments to Atlas Core for analysis only.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { chmodSync, mkdtempSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -11,7 +11,7 @@ import {
 const HISTORY = JSON.parse(readFileSync(new URL("../examples/history-export.json", import.meta.url)));
 
 // A Core CLI that records every call (argv and environment) and answers like Core.
-function fakeAtlas() {
+function fakeAtlas(mode = "") {
   const dir = mkdtempSync(join(tmpdir(), "fake-atlas-"));
   const calls = join(dir, "calls.jsonl");
   const bin = join(dir, "atlas");
@@ -20,8 +20,11 @@ const fs = require("fs");
 fs.appendFileSync(${JSON.stringify(calls)}, JSON.stringify({ argv: process.argv.slice(2), env: process.env }) + "\\n");
 const [cmd] = process.argv.slice(2);
 if (cmd === "create") console.log("run-1");
-if (cmd === "run") console.log(JSON.stringify({ evaluations: [{ passed: true }], outputs: ["ok"] }));
-if (cmd === "inspect") console.log(JSON.stringify({ status: "done", stop_reason: "passed",
+const mode = ${JSON.stringify(mode)};
+if (cmd === "run") console.log(mode === "no-schema" ? JSON.stringify({ evaluations: [] })
+  : JSON.stringify({ schema: "atlas-run.v1", run_id: "run-1", evaluations: [{ passed: true }], outputs: ["ok"] }));
+if (cmd === "inspect") console.log(JSON.stringify({ schema: mode === "bad-inspect" ? "atlas-inspect.v9" : "atlas-inspect.v1",
+  run_id: "run-1", status: "done", stop_reason: "passed",
   source_details: [{ path: "README.md", content_sha256: "a".repeat(64), source_id: "s" }], uncertainties: [] }));
 `);
   chmodSync(bin, 0o755);
@@ -46,13 +49,14 @@ test("Core is called create -> run -> inspect, without a shell, read-only", () =
   const calls = atlas.calls();
   assert.deepEqual(calls.map((c) => c.argv[0]), ["create", "run", "inspect"]);
   const run = calls[1].argv;
-  assert.equal(run[run.indexOf("--repo-path") + 1], join(atlas.dir, "workspace"));
+  assert.equal(run[run.indexOf("--repo-path") + 1], out.workspace);
+  assert.ok(out.workspace.startsWith(join(atlas.dir, "atlas-loop-core-")));
   assert.equal(run[run.indexOf("--run-id") + 1], "run-1");
   assert.ok(!run.includes("propose") && !calls.some((c) => c.argv[0] === "propose"));
   assert.equal(out.stop_reason, "passed");
   assert.equal(out.experiments, 3);
   assert.deepEqual(out.sources, [{ path: "README.md", sha256: "a".repeat(64) }]);
-  assert.ok(existsSync(join(atlas.dir, "workspace", "README.md")));
+  assert.ok(existsSync(join(out.workspace, "README.md")));
 });
 
 test("nothing from atlas-loop's environment reaches Core", () => {
@@ -101,4 +105,27 @@ test("the workspace's metric text matches the UI's definitions", () => {
                       "metrics.follows * 4", "metrics.profileVisits", "const reach = metrics.reach"]) {
     assert.ok(app.includes(term), `docs/app.js no longer has ${term}; update renderWorkspace's note`);
   }
+});
+
+test("only Core's own documents are read: anything else fails closed", () => {
+  for (const mode of ["no-schema", "bad-inspect"]) {
+    const atlas = fakeAtlas(mode);
+    assert.throws(
+      () => analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, env: { PATH: process.env.PATH } }),
+      HistoryRefused, mode);
+  }
+});
+
+test("--workdir is a parent: an existing workspace is never overwritten", () => {
+  const atlas = fakeAtlas();
+  const existing = join(atlas.dir, "workspace");
+  mkdirSync(existing);
+  writeFileSync(join(existing, "README.md"), "mine");
+  const out = analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, env: { PATH: process.env.PATH } });
+  assert.equal(readFileSync(join(existing, "README.md"), "utf8"), "mine");
+  assert.notEqual(out.workspace, existing);
+  const second = analyze(HISTORY, { bin: atlas.bin, workdir: atlas.dir, env: { PATH: process.env.PATH } });
+  assert.notEqual(second.workspace, out.workspace);
+  assert.throws(() => analyze(HISTORY, { bin: atlas.bin, workdir: join(atlas.dir, "missing") }),
+                HistoryRefused);
 });

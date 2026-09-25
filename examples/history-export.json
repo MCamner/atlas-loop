@@ -1,0 +1,35 @@
+[
+  {
+    "id": "exp-hook-question",
+    "content": "Stop scrolling: which of these three habits costs you the most time?",
+    "mode": "hook",
+    "brief": {"audience": "freelance designers", "pillar": "productivity", "hypothesis": "A question hook raises comments", "format": "reel", "metricToWin": "comments", "risk": "low reach"},
+    "postedAt": "2026-09-01T09:00:00.000Z",
+    "metrics": {"reach": 4200, "plays": 6100, "likes": 310, "saves": 96, "shares": 41, "comments": 58, "follows": 12, "profileVisits": 70},
+    "rates": {"saveRate": "2.29%", "shareRate": "0.98%", "commentRate": "1.38%", "followRate": "0.29%"},
+    "signalScore": 1120,
+    "nextTest": "Same hook, carousel format"
+  },
+  {
+    "id": "exp-carousel-checklist",
+    "content": "A 7-step checklist for your first client call.",
+    "mode": "content",
+    "brief": {"audience": "freelance designers", "pillar": "client work", "hypothesis": "Checklists get saved", "format": "carousel", "metricToWin": "saves", "risk": "too generic"},
+    "postedAt": "2026-09-05T09:00:00.000Z",
+    "metrics": {"reach": 3100, "plays": 0, "likes": 190, "saves": 210, "shares": 64, "comments": 9, "follows": 21, "profileVisits": 55},
+    "rates": {"saveRate": "6.77%", "shareRate": "2.06%", "commentRate": "0.29%", "followRate": "0.68%"},
+    "signalScore": 1301,
+    "nextTest": ""
+  },
+  {
+    "id": "exp-unmeasured",
+    "content": "Behind the scenes of a redesign.",
+    "mode": "content",
+    "brief": {"audience": "", "pillar": "", "hypothesis": "", "format": "reel", "metricToWin": "", "risk": ""},
+    "postedAt": "2026-09-10T09:00:00.000Z",
+    "metrics": null,
+    "rates": null,
+    "signalScore": 0,
+    "nextTest": ""
+  }
+]

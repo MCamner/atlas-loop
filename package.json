@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check server.mjs && bash -n cli/atlas-loop.sh && bash -n release.sh"
+    "check": "node --check server.mjs && bash -n cli/atlas-loop.sh && bash -n release.sh && node --check scripts/core-analyze.mjs",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=18"
